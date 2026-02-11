@@ -1,0 +1,29 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  document.write('<h1 style="color: red; padding: 20px;">錯誤：找不到根元素</h1>')
+  throw new Error('找不到 #root 元素')
+}
+
+try {
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+} catch (error) {
+  console.error('渲染失敗:', error)
+  rootElement.innerHTML = \`
+    <div style="padding: 20px; text-align: center; color: red;">
+      <h1>應用程式加載失敗</h1>
+      <p>\${error instanceof Error ? error.message : '未知錯誤'}</p>
+      <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        重新加載
+      </button>
+    </div>
+  \`
+}

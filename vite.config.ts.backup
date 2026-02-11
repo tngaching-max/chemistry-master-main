@@ -1,0 +1,71 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  
+  // 重要：确保基础路径正确
+  base: '/',
+  
+  // 构建优化配置
+  build: {
+    outDir: 'dist',
+    sourcemap: false, // 生产环境关闭 sourcemap 以减少体积
+    
+    // 提高 chunk 大小警告限制
+    chunkSizeWarningLimit: 1000,
+    
+    // 优化分包配置
+    rollupOptions: {
+      output: {
+        // 手动分包，优化加载性能
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor-react'
+            }
+            if (id.includes('@google/genai')) {
+              return 'vendor-gemini'
+            }
+            return 'vendor-other'
+          }
+        },
+        
+        // 优化文件名
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    
+    // 优化构建目标
+    target: 'es2020',
+    
+    // 最小化配置
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // 生产环境移除 console.log
+        drop_debugger: true
+      }
+    }
+  },
+  
+  // 服务器配置（开发用）
+  server: {
+    port: 3000,
+    host: true,
+    open: true
+  },
+  
+  // 预览配置
+  preview: {
+    port: 4173,
+    host: true
+  },
+  
+  // 依赖优化
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@google/genai']
+  }
+})
